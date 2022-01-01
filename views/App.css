@@ -1,0 +1,35 @@
+ /* *,*::before,*::after{
+  border: 1px solid green;
+}
+
+.testing{
+  border: 1px solid red !important;
+} */
+.hoverable {
+  opacity: 0.85;
+  transition: opacity 0.5s ease, box-shadow 0.25s ease;
+}
+.hoverable:hover, .hoverable:focus {
+  cursor: pointer;
+  opacity: 1;
+  -webkit-box-shadow: -1px 0px 10px -3px;
+  -moz-box-shadow: -1px 0px 10px -3px;
+  box-shadow: -1px 0px 10px -3px;
+}
+
+body{
+  min-height: 100vh;
+}
+#react-ssr-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.pageFooter {
+  justify-self: flex-end;
+}
+
+.pre-line {
+  white-space: pre-line;
+}
