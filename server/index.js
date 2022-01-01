@@ -36,9 +36,7 @@ const app = express();
       resave: true,
       saveUninitialized: false,
       store: MongoStore.create({
-        url: process.env.MONGODB_URI,
-        ttl: 14 * 24 * 60 * 60,
-        autoRemove: 'native' 
+        mongoUrl: process.env.MONGODB_URI 
       })
   }));
 
