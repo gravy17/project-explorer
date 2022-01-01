@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const flash = require('express-flash');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const register = require('@react-ssr/express/register');
 const app = express();
 
@@ -35,7 +35,7 @@ const app = express();
       },
       resave: true,
       saveUninitialized: false,
-      store: new MongoStore({
+      store: MongoStore.create({
         url: process.env.MONGODB_URI,
         ttl: 14 * 24 * 60 * 60,
         autoRemove: 'native' 
