@@ -46,7 +46,6 @@ const app = express();
   app.use('/', require('./controllers/user'));
   app.use('/', require('./controllers/project'));
   app.use('/', require('./controllers/search'));
-  app.use(express.static('public'));
 
   //Catch-all for 404 Errors
   app.all('*', (req, res) => {

@@ -14,16 +14,12 @@
 	"scripts": {
 		"dev": "nodemon server/index.js",
 		"start": "node server/index.js",
-		"test": "jest",
-		"heroku-prebuild": "echo This runs before Heroku installs dependencies.",
-		"heroku-postbuild": "echo This runs after Heroku installs dependencies, but before Heroku prunes and caches dependencies.",
-		"heroku-cleanup": "echo This runs after Heroku prunes and caches dependencies."
+		"test": "jest"
 	},
 	"license": "ISC",
 	"dependencies": {
 		"@react-ssr/core": "^0.24.0",
 		"@react-ssr/express": "^0.24.0",
-		"axios": "^0.24.0",
 		"body-parser": "^1.19.0",
 		"bootstrap": "^4.5.3",
 		"connect-mongo": "^4.6.0",
