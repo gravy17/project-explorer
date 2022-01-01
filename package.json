@@ -2,7 +2,10 @@
 	"name": "project-explorer-tofarati",
 	"version": "2.0.0",
 	"description": "An app for students to share and find projects",
-	"keywords": ["project", "explorer"],
+	"keywords": [
+		"project",
+		"explorer"
+	],
 	"author": "Oluwatofarati Agbaje",
 	"scripts": {
 		"dev": "nodemon server/index.js",
@@ -16,6 +19,7 @@
 		"axios": "^0.24.0",
 		"body-parser": "^1.19.0",
 		"bootstrap": "^4.5.3",
+		"connect-mongo": "^4.6.0",
 		"dotenv": "^8.2.0",
 		"express": "^4.17.1",
 		"express-flash": "0.0.2",

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const flash = require('express-flash');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const register = require('@react-ssr/express/register');
 const app = express();
 
@@ -27,16 +28,20 @@ const app = express();
   app.use(flash());
 
   app.use(session({
-      secret: 'secret',
+      secret: process.env.SESSION_SECRET || 'secret',
       cookie: {
           maxAge: 1000 * 60 * 60 * 24 * 7,
           sameSite: true
       },
       resave: true,
-      saveUninitialized: false
+      saveUninitialized: false,
+      store: new MongoStore({
+        url: process.env.MONGODB_URI,
+        ttl: 14 * 24 * 60 * 60,
+        autoRemove: 'native' 
+      })
   }));
 
-  app.use('/api', require('./routes/api'));
   app.use('/', require('./controllers/home'));
   app.use('/', require('./controllers/user'));
   app.use('/', require('./controllers/project'));
