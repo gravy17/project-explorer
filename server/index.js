@@ -70,6 +70,7 @@ const app = express();
   mongoose.connect (
       process.env.MONGODB_URI,
       {
+          ssl: true,
           useNewUrlParser: true,
           useUnifiedTopology: true
       },
