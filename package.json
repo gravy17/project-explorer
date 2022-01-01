@@ -12,9 +12,7 @@
 		"npm": "6.x"
 	},
 	"scripts": {
-		"dev": "nodemon server/index.js",
-		"start": "node server/index.js",
-		"test": "jest"
+		"start": "node --optimize_for_size --max_old_space_size=460 server/index.js"
 	},
 	"license": "ISC",
 	"dependencies": {
@@ -33,14 +31,6 @@
 		"react": "^17.0.1",
 		"react-bootstrap": "^1.4.0",
 		"react-dom": "^17.0.1"
-	},
-	"devDependencies": {
-		"@testing-library/react": "^12.1.2",
-		"cross-env": "^7.0.2",
-		"enzyme": "^3.11.0",
-		"faker": "^5.5.3",
-		"jest": "^27.4.5",
-		"nodemon": "^2.0.4"
 	},
 	"babel": {
 		"presets": [
