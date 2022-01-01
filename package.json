@@ -7,10 +7,17 @@
 		"explorer"
 	],
 	"author": "Oluwatofarati Agbaje",
+	"engines": {
+		"node": "14.x",
+		"npm": "6.x"
+	},
 	"scripts": {
 		"dev": "nodemon server/index.js",
 		"start": "node server/index.js",
-		"test": "jest"
+		"test": "jest",
+		"heroku-prebuild": "echo This runs before Heroku installs dependencies.",
+		"heroku-postbuild": "echo This runs after Heroku installs dependencies, but before Heroku prunes and caches dependencies.",
+		"heroku-cleanup": "echo This runs after Heroku prunes and caches dependencies."
 	},
 	"license": "ISC",
 	"dependencies": {
