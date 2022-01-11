@@ -7,7 +7,7 @@ const projectService = require('../services/project');
 router.get('/', async(req, res) => {
   const projects = await projectService.getAll();
   const projectShowcase = projects?.slice(0,4);
-  console.log('Projects:'+projectShowcase);
+  // console.log('Projects:'+projectShowcase);
   res.status(200)
   .render('Home', {projects: projectShowcase, user: req.session.user });
 });

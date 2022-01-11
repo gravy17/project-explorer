@@ -36,7 +36,7 @@ const app = express();
       resave: true,
       saveUninitialized: false,
       store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI 
+        mongoUrl: process.env.MONGODB_URI
       })
   }));
 
@@ -53,14 +53,14 @@ const app = express();
 
   //Handler for all errors. Renders an Error page
   app.use((err, req, res, next) => {
-    if(process.env.PRODUCTION){
+    if(!process.env.PRODUCTION){
         res.status(err.status || 500);
-        res.render('Failure', {user: req.session.user, error:err });
+        res.render('Failure', {user: req.session?.user || {}, error:err });
     } else {
         if(!err.status) { err.message = "Internal Server Error"; console.error(err);}
         res.status(err.status || 500);
-        res.render('Failure', {user: req.session.user, error:{ status:err.status, message:err.message } });
-    }    
+        res.render('Failure', {user: req.session?.user || {}, error:{ status:err.status, message:err.message } });
+    }
   });
 
   app.listen(process.env.PORT, () => console.log('Server listening on port ' + process.env.PORT));
@@ -76,10 +76,13 @@ const app = express();
       },
       (err) => {
           if (err) {
-              console.log("Error connecting to db: ", err);
+              console.error("Error connecting to db: ", err);
           } else {
-              console.log(`Connected to MongoDB`);
+              console.error(`Connected to MongoDB`);
           }
       }
   );
+  mongoose.connection.on('error', err => {
+      console.error(err);
+  })
 })()
