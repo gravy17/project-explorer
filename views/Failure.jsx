@@ -1,9 +1,7 @@
 import React from 'react';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Button from 'react-bootstrap/Button';
-import Container from 'react-bootstrap/Container';
 import Layout from './shared/Layout';
-import ProjectInfo from './shared/ProjectInfo';
 
 const Error = ({user, error}) => {
 

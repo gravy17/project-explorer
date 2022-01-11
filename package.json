@@ -12,7 +12,8 @@
 		"npm": "6.x"
 	},
 	"scripts": {
-		"start": "node --optimize_for_size --max_old_space_size=460 server/index.js"
+		"start": "node --optimize_for_size --max_old_space_size=460 server/index.js",
+		"debug": "node --inspect server/index.js"
 	},
 	"license": "ISC",
 	"dependencies": {

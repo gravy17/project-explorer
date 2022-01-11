@@ -39,6 +39,15 @@ const getAll = async() => {
   }
 };
 
+const getShowcase = async() => {
+  try {
+    return await Project.find({}).limit(4).sort({createdAt: -1}).lean();
+  }
+  catch(err) {
+    console.log(translateError(err)) ;
+  }
+};
+
 /* Return projects matching a search term */
 const searchByCriteria = async(query) => {
   const pipeline = generatePipeline(query);
@@ -57,6 +66,7 @@ const deleteProject = async(project) => {
 
 module.exports = {
   getAll,
+  getShowcase,
   create,
   getById,
   searchByCriteria,

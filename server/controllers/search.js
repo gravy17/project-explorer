@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const projectService = require('../services/project');
+const { searchByCriteria } = require('../services/project');
 const PAGE_SIZE = parseInt(process.env.PAGE_SIZE);
 
 router.get('/search', async(req, res) => {
@@ -18,7 +18,7 @@ router.get('/search', async(req, res) => {
         page: parseInt(req.query.page) || 1 ,
         page_size: PAGE_SIZE 
     };
-    const [isFound, results] = await projectService.searchByCriteria(query);
+    const [isFound, results] = await searchByCriteria(query);
     if(isFound) { //if successful, render current page
         res.status(200)
         .render('Search', {user: req.session.user, results: results, currentSearch: query });

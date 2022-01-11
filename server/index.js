@@ -78,7 +78,7 @@ const app = express();
           if (err) {
               console.error("Error connecting to db: ", err);
           } else {
-              console.error(`Connected to MongoDB`);
+              console.log(`Connected to MongoDB`);
           }
       }
   );

@@ -2,12 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
-const schoolService = require('../services/school');
-const userService = require('../services/user');
+const { getPrograms, getGradYears } = require('../services/school');
+const {create, authenticate } = require('../services/user');
 
 router.get('/signup', (req, res) => {
-  const programs = schoolService.getPrograms();
-  const graduationYears = schoolService.getGradYears();
+  const programs = getPrograms();
+  const graduationYears = getGradYears();
 
   const errorMsg = req.flash('error');
   let formData, errors;
@@ -28,7 +28,7 @@ router.post('/signup', async(req, res) => {
     program: req.body.program, 
     matricNumber: req.body.matricNumber, 
     graduationYear: req.body.graduationYear };
-  const [isCreated, result] = await userService.create(newUser);
+  const [isCreated, result] = await create(newUser);
 
   if(isCreated){
     req.session.user = result;
@@ -53,7 +53,7 @@ router.get('/login', (req, res) => {
 
 router.post('/login', async(req, res) => {
   const {email, password} = req.body;
-  const [isAuthenticated, result] = await userService.authenticate(email, password);
+  const [isAuthenticated, result] = await authenticate(email, password);
 
   if(isAuthenticated){
     req.session.user = result;

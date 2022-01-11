@@ -2,14 +2,12 @@ const express = require('express');
 
 const router = express.Router();
 
-const projectService = require('../services/project');
+const { getShowcase } = require('../services/project');
 
 router.get('/', async(req, res) => {
-  const projects = await projectService.getAll();
-  const projectShowcase = projects?.slice(0,4);
-  // console.log('Projects:'+projectShowcase);
+  const projects = await getShowcase();
   res.status(200)
-  .render('Home', {projects: projectShowcase, user: req.session.user });
+  .render('Home', {projects: projects, user: req.session.user });
 });
 
 router.get('/logout', async(req, res) => {
