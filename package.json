@@ -1,36 +1,44 @@
 {
-	"name": "project-explorer-tofarati",
-	"version": "2.0.0",
-	"description": "An app for students to share and find projects",
-	"keywords": [
-		"project",
-		"explorer"
-	],
-	"author": "Oluwatofarati Agbaje",
-	"engines": {
-		"node": "14.x",
-		"npm": "6.x"
-	},
-	"scripts": {
-		"start": "node --optimize_for_size --max_old_space_size=460 server/index.js",
-		"debug": "node --inspect server/index.js"
-	},
-	"license": "ISC",
-	"dependencies": {
-		"@react-ssr/core": "^0.24.0",
-		"@react-ssr/express": "^0.24.0",
-		"body-parser": "^1.19.0",
-		"bootstrap": "^4.5.3",
-		"connect-mongo": "^4.6.0",
-		"dotenv": "^8.2.0",
-		"express": "^4.17.1",
-		"express-flash": "0.0.2",
-		"express-session": "^1.17.1",
-		"mongodb": "^4.1.1",
-		"mongoose": "^6.0.5",
-		"morgan": "^1.10.0",
-		"react": "^16",
-		"react-bootstrap": "^1.4.0",
-		"react-dom": "^16"
-	}
+  "name": "project-explorer-tofarati",
+  "private": true,
+  "version": "3.0.0",
+  "description": "An app for students to share and find projects",
+  "keywords": [
+    "project",
+    "explorer"
+  ],
+  "author": "Oluwatofarati Agbaje",
+  "engines": {
+    "node": "14.x",
+    "npm": "6.x"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "build": "next build",
+    "start": "node server.js",
+    "lint": "next lint"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bootstrap": "^4.5.3",
+    "connect-mongo": "^4.6.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-flash": "0.0.2",
+    "express-react-views": "^0.11.0",
+    "express-session": "^1.17.1",
+    "mongodb": "^4.1.1",
+    "mongoose": "^6.0.5",
+    "morgan": "^1.10.0",
+    "next": "12.0.8",
+    "react": "17.0.2",
+    "react-bootstrap": "^1.4.0",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "eslint": "8.6.0",
+    "eslint-config-next": "12.0.8",
+    "nodemon": "^2.0.15"
+  }
 }
