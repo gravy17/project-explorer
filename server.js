@@ -84,14 +84,15 @@ app.prepare().then(() => {
     
     try {
         mongoose.set("bufferCommands", false);
-        await mongoose.connect (
+        mongoose.connect (
         process.env.MONGODB_URI,
         {
             ssl: true,
             useNewUrlParser: true,
             useUnifiedTopology: true
+        }).then(() => {
+            console.log(`Connected to MongoDB`);
         });
-        console.log(`Connected to MongoDB`);
         mongoose.connection.on('error', err => {
             console.error(err);
         })
