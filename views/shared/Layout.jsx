@@ -1,15 +1,18 @@
-import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 
 const Layout = ({user, children}) => {
   return (
     <>
-      <Header user={user}/>
-      <main className="p-5 container-fluid">
+      <header className='sticky-top'>
+        <Header user={user}/>
+      </header>
+      <main className="pt-5 px-0 container-fluid bg-gradient flex-grow-1 h-100">
       {children}
       </main>
-      <Footer/>
+      <footer>
+        <Footer/>
+      </footer>
     </>
   )
 }

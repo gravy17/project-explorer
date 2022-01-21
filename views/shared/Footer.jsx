@@ -1,12 +1,20 @@
-import React from 'react';
 import Navbar from 'react-bootstrap/Navbar';
+import Button from 'react-bootstrap/Button';
+import { useContext } from "react";
+import { ThemeContext } from "./Theme";
 
-const Footer = (props) => {
-
+const Footer = () => {
+  const { toggle, dark } = useContext(ThemeContext);
+ 
   return (
-    <Navbar bg='light' expand='lg' className='d-flex flex-row-reverse pageFooter'>
-      Project Explorer &copy; 2020 &#8729; Edconnect
-    </Navbar>
+    <footer>
+      <Navbar expand='lg' className='d-flex flex-row pageFooter pt-5 bg-theme justify-content-between'>
+        <Button variant='outline-primary' size="sm" onClick={toggle}>{dark ? 'Light': 'Dark'} Mode</Button>
+        <div>
+        Project Explorer &copy; 2022 &#8729; Tofi Agbaje &#8729; BetterChalk.ng
+        </div>
+      </Navbar>
+    </footer>
   );
 }
 

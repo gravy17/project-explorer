@@ -1,7 +1,8 @@
-const Project = require("../models/project");
-const {translateError} = require("../models/mongo_helper");
-const {generatePipeline} = require("../utils/searchQuery");
-const { ObjectId } = require("mongodb");
+import { ObjectId } from "mongodb";
+
+import Project, { findById, find, aggregate, deleteOne } from "../models/project";
+import { translateError } from "../models/mongo_helper";
+import { generatePipeline } from "../lib/utils/searchQuery";
 
 /* Create new project */
 const create = async({ name, abstract, authors, tags, createdBy }) => {
@@ -23,16 +24,17 @@ const create = async({ name, abstract, authors, tags, createdBy }) => {
 /* Return project with specified id */
 const getById = async(id) => {
   try {
-    return await Project.findById(id).populate('createdBy').lean();
+    return await findById(id).populate('createdBy').lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
   }
 };
+
 /* Return all projects */
 const getAll = async() => {
   try {
-    return await Project.find({}).lean();
+    return await find({}).lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
@@ -41,7 +43,7 @@ const getAll = async() => {
 
 const getShowcase = async() => {
   try {
-    return await Project.find({}).limit(4).sort({createdAt: -1}).lean();
+    return await find({}).limit(4).sort({createdAt: -1}).lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
@@ -52,7 +54,7 @@ const getShowcase = async() => {
 const searchByCriteria = async(query) => {
   const pipeline = generatePipeline(query);
   try {
-    const results = await Project.aggregate(pipeline).exec();
+    const results = await aggregate(pipeline).exec();
     return [true, results];
   }
   catch(error) {
@@ -61,10 +63,10 @@ const searchByCriteria = async(query) => {
 };
 
 const deleteProject = async(project) => {
-  return await Project.deleteOne({ _id: ObjectId(project._id) });
+  return await deleteOne({ _id: ObjectId(project._id) });
 }
 
-module.exports = {
+export default {
   getAll,
   getShowcase,
   create,

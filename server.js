@@ -9,11 +9,12 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const next = require('next');
 
-const dev = process.env.PRODUCTION !== 'true';
+const dev = !(Boolean(process.env.PRODUCTION));
 const app = next({ dev });
+const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
-    const server = express()
+    const server = express();
 
     server.use((req, res, next) => {
         res.header('Access-Control-Allow-Origin', '*');
@@ -28,78 +29,64 @@ app.prepare().then(() => {
     }));
     server.use(flash());
     
-    try{
-    server.use(session({
-        secret: process.env.SESSION_SECRET || 'secret',
-        cookie: {
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: true
-        },
-        resave: true,
-        saveUninitialized: false,
-        store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI
-        })
-    }));
-    } catch (err) {
-        server.use(session({
+    mongoose.set("bufferCommands", false);
+    mongoose.connection.on('error', err => {
+        console.error(err);
+    });
+    mongoose.connect (
+    process.env.MONGODB_URI,
+    {
+        // ssl: true,
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(() => {
+        console.log(`Connected to MongoDB`);
+    });
+
+    server.use(
+        session({
             secret: process.env.SESSION_SECRET || 'secret',
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 7,
                 sameSite: true
             },
             resave: true,
-            saveUninitialized: false
-        }));
-    }
+            saveUninitialized: false,
+            store: MongoStore.create({
+            mongoUrl: process.env.MONGODB_URI
+            })
+        }) 
+    );
+    
+    server.use(express.static("public"));
 
-    server.set('views', __dirname + '/views');
-    server.set('view engine', 'jsx');
-    server.engine('jsx', require('express-react-views').createEngine());
-        
-    server.use('/', require('./controllers/home'));
-    server.use('/', require('./controllers/user'));
-    server.use('/', require('./controllers/project'));
-    server.use('/', require('./controllers/search'));
+    // server.use('/', require('./controllers/home'));
+    // server.use('/', require('./controllers/user'));
+    // server.use('/', require('./controllers/project'));
+    // server.use('/', require('./controllers/search'));
     
-    //Catch-all for 404 Errors
-    server.all('*', (req, res) => {
-    const err = { stack: new Error().stack, message: 'Not Found', status: 404};
-    throw err;
+    server.get("*", (req, res) => {
+        return handle(req, res);
     });
+
+    // //Catch-all for 404 Errors
+    // server.all('*', (req, res) => {
+    // const err = { stack: new Error().stack, message: 'Not Found', status: 404};
+    // throw err;
+    // });
     
-    //Handler for all errors. Renders an Error page
-    server.use((err, req, res, next) => {
-    if(!process.env.PRODUCTION){
-        res.status(err.status || 500);
-        res.render('Failure', {user: req.session?.user || {}, error:err });
-    } else {
-        if(!err.status) { err.message = "Internal Server Error"; console.error(err);}
-        res.status(err.status || 500);
-        res.render('Failure', {user: req.session?.user || {}, error:{ status:err.status, message:err.message } });
-    }
-    });
-    
+    // //Handler for all errors. Renders an Error page
+    // server.use((err, req, res, next) => {
+    // if(!process.env.PRODUCTION){
+    //     res.status(err.status || 500);
+    //     res.render('Failure', {user: req.session?.user || {}, error:err });
+    // } else {
+    //     if(!err.status) { err.message = "Internal Server Error"; console.error(err);}
+    //     res.status(err.status || 500);
+    //     res.render('Failure', {user: req.session?.user || {}, error:{ status:err.status, message:err.message } });
+    // }
+    // });
     server.listen(process.env.PORT, () => console.log('Server listening on port ' + process.env.PORT));
-    
-    try {
-        mongoose.set("bufferCommands", false);
-        mongoose.connect (
-        process.env.MONGODB_URI,
-        {
-            ssl: true,
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        }).then(() => {
-            console.log(`Connected to MongoDB`);
-        });
-        mongoose.connection.on('error', err => {
-            console.error(err);
-        })
-    } 
-    catch (err) {
-        console.error("Failed to connect to DB: "+ err)        
-    }
 })
 .catch((ex) => {
     console.error(ex.stack)
