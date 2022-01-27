@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
-import ThemeProvider from "../views/shared/Theme";
-import Loader from '../views/shared/Loader';
+import ThemeProvider from "../components/ThemeContext";
+import ToastProvider from '../components/MessageContext';
+import AuthProvider from '../components/UserContext';
+import Loader from '../components/shared/Loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../styles/globals.css';
 
@@ -23,10 +25,13 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ThemeProvider>
-      {loading?
-        <Loader/>:
-        <Component {...pageProps}/>
-      }    
+        <Loader loading={loading}/>
+        {!loading && 
+        <ToastProvider>
+          <AuthProvider>
+            <Component {...pageProps}/>
+          </AuthProvider>
+        </ToastProvider>}
     </ThemeProvider>
   )
 }

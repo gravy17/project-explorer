@@ -31,6 +31,6 @@ const translateError = (err) => {
   return errors;
 };
 
-export default {
+module.exports = {
   translateError,
 };

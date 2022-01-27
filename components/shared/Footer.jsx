@@ -1,11 +1,8 @@
 import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
-import { useContext } from "react";
-import { ThemeContext } from "./Theme";
 
-const Footer = () => {
-  const { toggle, dark } = useContext(ThemeContext);
- 
+const Footer = ({toggle, dark}) => {
+  
   return (
     <footer>
       <Navbar expand='lg' className='d-flex flex-row pageFooter pt-5 bg-theme justify-content-between'>

@@ -1,20 +1,26 @@
-import React, { useState, useLayoutEffect, useEffect } from "react";
+import { createContext, useState, useLayoutEffect, useEffect, useRef } from "react";
 
-export const ThemeContext = React.createContext({
+export const ThemeContext = createContext({
   dark: false,
   toggle: () => {}
 });
 
 export default function ThemeProvider({ children }) {
-  let prefersDark
+  const prefersDark = useRef();
   useEffect(() => {
-    prefersDark =  window.matchMedia("(prefers-color-scheme: dark)").matches;
+    prefersDark.current = localStorage.getItem('prefersDark');
+    if(!prefersDark.current) {
+      prefersDark.current = matchMedia("(prefers-color-scheme: dark)").matches;  
+    }
   }, [])
   
-  const [dark, setDark] = useState(prefersDark || false);
+  const [dark, setDark] = useState(prefersDark.current || false);
+  if(typeof window !== "undefined"){
   useLayoutEffect(() => {
     applyTheme();
-  }, [dark]);
+    localStorage.setItem('prefersDark', dark);
+  });
+  }
 
   const applyTheme = () => {
     const root = document.getElementsByTagName("body")[0];

@@ -5,14 +5,18 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Layout from '../../views/shared/Layout';
-import ProjectTag from '../../views/shared/ProjectTag';
+import Layout from '../../components/shared/Layout';
+import ProjectTag from '../../components/shared/ProjectTag';
+import Head from 'next/head';
 
-export default function Project({user, project, creatorName}) {
+export default function Project({project, creatorName}) {
 
   return (
-    <Layout user={user}>
+    <Layout>
       <>
+        <Head>
+          <title>Project- (project.name) | Project-Explorer</title>
+        </Head>
         <h4 className='mt-4 ml-4' id='project_name'>{project?.name}</h4>
         <Container fluid className='mb-4 ml-4'>
           <Row className='py-2'>
@@ -69,3 +73,17 @@ export default function Project({user, project, creatorName}) {
     </Layout>
   );
 }
+
+
+
+// export async function getStaticPaths({}){
+//   const req = await fetch();
+//   const data = await req.json();
+//   const paths = data.map(path => {
+//     return { params: { id: path}}
+//   })
+//   return {
+//     paths,
+//     fallback: false
+//   };
+// }

@@ -1,30 +1,44 @@
-import Program, { find, findOne } from "../models/program";
+import Program from "../models/program";
 import { translateError } from "../models/mongo_helper";
+import dbConnect from "../lib/middleware/dbConnect";
 
-/* Add to list of programs */
-const addProgram = async({ name, accredYear }) => {
+let cached = global.school;
+let today = new Date();
+let expiry = new Date(today);
+expiry.setDate(expiry.getDate() + 1);
+expiry.setHours(0,0,0,0);
+
+if(!cached) {
+  cached = global.school = { programs: null, gradYears: null }
+}
+
+const cacheClear = setInterval(() => {
+  if( new Date() >= expiry ){
+    cached.programs = null;
+    cached.gradYears = null;
+    today = new Date();
+    expiry = new Date(today);
+    expiry.setDate(expiry.getDate() + 1);
+    expiry.setHours(0,0,0,0);
+  }
+}, 1000*60*60);
+cacheClear.unref();
+
+export const addProgram = async({ name, accredYear }) => {
   const program = new Program({ name, accredYear });
   try{
+    await dbConnect();
     let created = await program.save();
     return [true, created];
   } catch (error) {
+    console.log(translateError(error));
     return [false, translateError(error)];
-  }
-};
-
-/* Get the list of all projects */
-const getAll = async() => {
-  try {
-    return await find({}).lean();
-  }
-  catch(err) {
-    console.log(translateError(err)) ;
   }
 };
 
 const findOldest = async() => {
   try {
-    return await findOne().sort('accredYear').lean();
+    return await Program.findOne().sort('accredYear').lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
@@ -32,27 +46,34 @@ const findOldest = async() => {
 }
 
 export async function getPrograms(){
-  let strArr = [ "Computer Science", "Computer Information Systems", "Computer technology" ];
-  const objArr = await getAll();
+  if (cached.programs) {
+    return cached.programs;
+  }
+  let programsArr = [];
+  await dbConnect();
+  const objArr = await Program.find({}).lean();
   if(objArr){
-    strArr = objArr.map((obj) => {
-      obj.name
+    objArr.map(({name}) => {
+      programsArr.push(name);
     })
   }
-  console.log(strArr);
-  return strArr;
+  cached.programs = programsArr.sort();
+  return programsArr;
 }
 
-/** Get list of grad years */
 export async function getGradYears(){
-  let yearsArr = ["2017", "2018", "2019", "2020", "2021", "2022"];
-  const firstGradYr = await findOldest();
+  if (cached.gradYears) {
+    return cached.gradYears;
+  }
+  let yearsArr = [];
+  await dbConnect();
+  const firstGradYr = (await findOldest())?.accredYear;
   let currentYear = new Date().getFullYear();
-  if(firstGradYr){ 
-    yearsArr = [];
-    for(i = firstGradYr; i <= currentYear+1; i++) {
+  if(firstGradYr){
+    for(let i = firstGradYr; i <= currentYear+1; i++) {
       yearsArr.push(i)
     } 
   }
+  cached.gradYears = yearsArr;
   return yearsArr;
 }

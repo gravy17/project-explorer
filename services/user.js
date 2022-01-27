@@ -1,10 +1,9 @@
 import { ObjectId } from "mongodb";
-import User, { findOne, findById, find, updateOne, deleteOne } from "../models/user";
+import User from "../models/user";
 import { translateError } from "../models/mongo_helper";
+import dbConnect from "../lib/middleware/dbConnect";
 
- 
-/* Creates new user */
-const create = async({ firstname, lastname, email, password, matricNumber, program, graduationYear }) => {
+export async function create({ firstname, lastname, email, password, matricNumber, program, graduationYear }) {
   const newUser = new User({
     firstname,
     lastname,
@@ -15,46 +14,48 @@ const create = async({ firstname, lastname, email, password, matricNumber, progr
   });
   try{
     newUser.setPassword(password);
+    await dbConnect();
     let created = await newUser.save();
+    delete created.password;
+    delete created.salt;
     return [true, created];
   } catch (error) {
     return [false, translateError(error)];
   }
 };
 
-/* Authenticate a user */
-const authenticate = async(email, password) => {
-  const user = await findOne({ email: email }, { projection: {password: 0, salt: 0 } });
+export async function authenticate(email, password) {
+  await dbConnect();
+  const user = await User.findOne({ email: email });
   if (user && user.validPassword(password)) {
+    user.password = null;
+    user.salt = null;
     return [true, user];
   } else {
     return [false, ["Invalid email/password"]];
   }
 };
 
-/* Return user with specified id */
-const getById = async(id) => {
-  return await findById(id, { projection: {password: 0, salt: 0 } }).lean();
+export async function getById(id) {
+  await dbConnect();
+  return await User.findById(id, { projection: {password: 0, salt: 0 } }).lean();
 };
 
-/* Return all users */
 const getAll = async() => {
-  return await find({}, { projection: {password: 0, salt: 0 } }).lean();
+  return await User.find({}, { projection: {password: 0, salt: 0 } }).lean();
 };
 
-/* Update a user with viewed project data*/
-const trackView = async(userid, project_view) => {
+export async function trackView(userid, project_view) {
   let res;
   try { 
-    //attempts to insert a new subdocument for first view
     const upsertFilter = { _id: userid, 'project_views.project_id': { $ne: project_view.project_id} };
     const upsertQuery = { $push: {project_views: project_view}};
-    res = await updateOne(upsertFilter, upsertQuery);
+    await dbConnect();
+    res = await User.updateOne(upsertFilter, upsertQuery);
     if(res.matchedCount === 0) {
-      //attempts to update an existing subdocument for subsequent views
       const updateFilter = { _id: userid, 'project_views.project_id': project_view.project_id };
       const updateQuery = { $set: { 'project_views.$.last_view': project_view.last_view} }
-      res = await updateOne(updateFilter, updateQuery);
+      res = await User.updateOne(updateFilter, updateQuery);
     }
   } catch (err) {
     console.log(err);
@@ -63,22 +64,12 @@ const trackView = async(userid, project_view) => {
   }
 };
 
-/*Return array of project views */
-const getViewHistory = async(id) => {
-  return await findById(id).select('project_views -_id');
+export async function getViewHistory(id) {
+  await dbConnect();
+  return await User.findById(id).select('project_views -_id');
 }
 
-/* Delete a user */
-const deleteUser = async(user) => {
-  return await deleteOne({ _id: ObjectId(user._id) });
+export async function deleteUser(user) {
+  await dbConnect();
+  return await User.deleteOne({ _id:  ObjectId(user._id) });
 }
-
-export default {
-  create,
-  authenticate,
-  getById,
-  getAll,
-  trackView,
-  getViewHistory,
-  deleteUser
-};

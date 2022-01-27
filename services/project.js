@@ -1,11 +1,22 @@
 import { ObjectId } from "mongodb";
-
-import Project, { findById, find, aggregate, deleteOne } from "../models/project";
+import Project from "../models/project";
 import { translateError } from "../models/mongo_helper";
-import { generatePipeline } from "../lib/utils/searchQuery";
+import generatePipeline from "../lib/utils/searchQuery";
+import dbConnect from "../lib/middleware/dbConnect";
 
-/* Create new project */
-const create = async({ name, abstract, authors, tags, createdBy }) => {
+const TTL = (1000 * 60 * 30);
+let cached = global.projects;
+
+if(!cached) {
+  cached = global.projects = { showcase: null };
+}
+
+const cacheClear = setInterval(() => {
+  cached.showcase = null;
+}, TTL);
+cacheClear.unref();
+
+export async function create({ name, abstract, authors, tags, createdBy }) {
   const project = new Project({
     name,
     abstract,
@@ -14,6 +25,7 @@ const create = async({ name, abstract, authors, tags, createdBy }) => {
     createdBy
   });
   try{
+    await dbConnect();
     let created = await project.save();
     return [true, created];
   } catch (error) {
@@ -21,40 +33,45 @@ const create = async({ name, abstract, authors, tags, createdBy }) => {
   }
 };
 
-/* Return project with specified id */
-const getById = async(id) => {
+export async function getById(id) {
   try {
-    return await findById(id).populate('createdBy').lean();
+    await dbConnect();
+    return await Project.findById(id).populate('createdBy').lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
   }
 };
 
-/* Return all projects */
-const getAll = async() => {
+async function getAll() {
   try {
-    return await find({}).lean();
+    return await Project.find({}).lean();
   }
   catch(err) {
     console.log(translateError(err)) ;
   }
 };
 
-const getShowcase = async() => {
+export async function getShowcase() {
+  if (cached.showcase) {
+    return cached.showcase;
+  }
   try {
-    return await find({}).limit(4).sort({createdAt: -1}).lean();
+    await dbConnect();
+    const projectArr = await Project.find({}).limit(4).sort({createdAt: -1}).lean();
+    cached.showcase = projectArr;
+    return projectArr;
   }
   catch(err) {
     console.log(translateError(err)) ;
   }
 };
 
-/* Return projects matching a search term */
-const searchByCriteria = async(query) => {
+export async function searchByCriteria(query) {
   const pipeline = generatePipeline(query);
   try {
-    const results = await aggregate(pipeline).exec();
+    await dbConnect();
+    const results = await Project.aggregate(pipeline).exec();
     return [true, results];
   }
   catch(error) {
@@ -62,15 +79,7 @@ const searchByCriteria = async(query) => {
   }
 };
 
-const deleteProject = async(project) => {
-  return await deleteOne({ _id: ObjectId(project._id) });
+export async function deleteProject(project) {
+  await dbConnect();
+  return await Project.deleteOne({ _id: ObjectId(project._id) });
 }
-
-export default {
-  getAll,
-  getShowcase,
-  create,
-  getById,
-  searchByCriteria,
-  deleteProject
-};

@@ -1,14 +1,17 @@
 import {Form, Button, Alert} from 'react-bootstrap';
-import Layout from '../../../views/shared/Layout';
+import Layout from '../../../components/shared/Layout';
+import Head from 'next/head';
 
-export default function CreateProject({user, errors}) {
+export default function CreateProject() {
 
   return (
-    <Layout user={user}>
+    <Layout>
       <>
+      <Head>
+          <title>Submit a Project | Project-Explorer</title>
+      </Head>
       <h2 className="mt-4 mx-4 themed form-header"><span className='mx-auto'>Submit Project</span></h2>
         <Form method='post' action='/projects/submit' id='createProjectForm' className='text-white mx-4'>
-          {errors? <Alert variant='danger' className="pre-line">{errors.join('\n')}</Alert> : null}
             <Form.Group className='mx-auto'>
               <Form.Label className='small'>Project Name</Form.Label>
               <Form.Control size='sm' type="text" name='name' placeholder="Project Title"/>
