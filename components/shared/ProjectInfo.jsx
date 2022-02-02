@@ -2,7 +2,7 @@ import Card from 'react-bootstrap/Card';
 import ProjectTag from './ProjectTag';
 import { useRouter } from 'next/router'; 
 
-const ProjectInfo = ({_id, name, abstract, authors, tags, last_view}) => {
+const ProjectInfo = ({_id, name, abstract, authors, tags, last_view }) => {
   const router = useRouter();
   
   const openDetails = () => {

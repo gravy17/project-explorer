@@ -5,11 +5,10 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { UserContext } from '../UserContext';
 
-const Header = ({user}) => {
+const Header = ({user, setAuthContext}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const handleSearchInput = (event) => {
     setSearchTerm(event.target.value);
@@ -29,10 +28,9 @@ const Header = ({user}) => {
     firstname = user;
   }
 
-  const { setAuthContext } = useContext(UserContext);
-  const logout = (event) => {
-    event.preventDefault();
+  const logout = async() => {
     setAuthContext({});
+    await fetch(`/api/logout`);
     router.push('/');
   }
 
@@ -56,7 +54,7 @@ const Header = ({user}) => {
         </Nav>
           {firstname?
           <Nav className='justify-content-end my-2 my-lg-0 '>
-            <Link href='/logout' onClick={logout} passHref><Nav.Link>Logout</Nav.Link></Link>
+            <Nav.Link onClick={logout}>Logout</Nav.Link>
             <Nav.Link id='username'>Hi {firstname}</Nav.Link>
           </Nav> :
           <Nav className='justify-content-end my-2 my-lg-0 '>

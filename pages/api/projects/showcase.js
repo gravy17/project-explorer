@@ -1,4 +1,4 @@
-import { getShowcase  } from '../../../services/projects';
+import { getShowcase } from '../../../services/project';
 
 export default async function handler (req, res) {
   const { method } = req;

@@ -2,7 +2,8 @@ import { createContext, useState, useEffect, useRef } from "react";
 
 export const MessageContext = createContext({
   messages: [],
-  notify: () => {}
+  notify: () => {},
+	cancelNotify: () => {}
 });
 
 const Toast = ({children, status, closeMsg}) => {
@@ -10,8 +11,14 @@ const Toast = ({children, status, closeMsg}) => {
 	const timer= useRef(null);
 	
 	useEffect(() => {
-		timer.current = setTimeout(() => {close()}, 1000*5);
-	}, [])
+		timer.current = setTimeout(() => {closeMsg()}, 1000*5);
+		return function cleanup() {
+			clearTimeout(timer.current);
+			timer.current = null;
+			setWideView(false);
+			closeMsg();
+		}
+	}, [closeMsg])
 
 	const open = function(){
 		setWideView(true);
@@ -43,14 +50,10 @@ export default function ToastProvider({ children }) {
   const [showing, setShowing] = useState(false);
 	const [status, setStatus] = useState('');
 
-	useEffect(() => {
-		if(messages.length){
-			showToast();
+	const showToast = () => {
+		if(!showing){
+			setShowing(true);
 		}
-  }, [messages]);
-
-  const showToast = () => {
-		setShowing(true);
   };
 
 	const hideToast = () => {
@@ -58,10 +61,6 @@ export default function ToastProvider({ children }) {
 		setStatus('');
 		setMessages([]);
   };
-
-	const closeMessage = () => {
-		hideToast();
-	}
 
   const notify = (msg, status) => {
 		if(typeof msg === 'object'){
@@ -82,15 +81,21 @@ export default function ToastProvider({ children }) {
 		setStatus(status || 'info');
   };
 
+	useEffect(() => {
+		console.log("Mounting Toast Provider")
+		if(messages.length){
+			setShowing(true);
+		}
+  }, [messages]);
+
   return (
     <MessageContext.Provider
       value={{
-        messages,
         notify
       }}
     >
       {children}
-			{showing && <Toast status={status} closeMsg={closeMessage}>{messages.map(message => message+'\n')}</Toast>}
+			{showing && <Toast status={status} closeMsg={hideToast}>{messages.map(message => message+'\n')}</Toast>}
     </MessageContext.Provider>
   );
 }

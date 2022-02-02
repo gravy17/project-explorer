@@ -6,8 +6,20 @@ import Layout from '../components/shared/Layout';
 import ProjectInfo from '../components/shared/ProjectInfo';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useContext, useEffect } from 'react';
+import { UserContext } from '../components/UserContext';
+import { getShowcase } from '../services/project';
 
-export default function Home({projects}) {
+export default function Home({ projects }) {
+  let project_views;
+  const { user } = useContext(UserContext);
+  
+  useEffect(() => {
+    if(user.project_views){
+      project_views = user.project_views;
+    }
+  }, [user])
+
   return (
     <Layout>
       <>
@@ -28,7 +40,10 @@ export default function Home({projects}) {
         </Jumbotron>
         <Container className='card-group pb-5'>
           {projects? 
-          projects.map((project) => <ProjectInfo key={String(project._id)} last_view={user?.project_views?.find((view) => view.project_id === project._id)?.last_view|| {}} {...project} />)
+          projects.map((project) => {
+            let last_view = project_views?.find((view) => view.project_id === project._id)?.last_view || null;
+            return (<ProjectInfo key={String(project._id)} {...project} last_view={last_view}/>);
+          })
           :<p className='weak-text m-4 p-5 small border border-muted rounded w-100 text-center'>There seem to be no Projects at the moment. Signup/Login to add yours</p>}
         </Container>
       </>
@@ -36,10 +51,17 @@ export default function Home({projects}) {
   );
 }
 
-// export async function getStaticProps({ }) {
-//   const req = await fetch();
-//   const data = await req.json();
-//   return {
-//     props: {}
-//   }
-// }
+export async function getStaticProps() {
+  try {
+    let projects = await getShowcase();
+    projects = JSON.parse(JSON.stringify(projects));
+    return {
+      props: {
+        projects
+      },
+      revalidate: 60*30 //30 mins
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}

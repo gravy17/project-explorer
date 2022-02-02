@@ -1,28 +1,26 @@
-import { createContext, useState, useLayoutEffect, useEffect, useRef } from "react";
+import { createContext, useState, useLayoutEffect, useCallback, useRef } from "react";
 
 export const ThemeContext = createContext({
-  dark: false,
+  dark: null,
   toggle: () => {}
 });
 
 export default function ThemeProvider({ children }) {
-  const prefersDark = useRef();
-  useEffect(() => {
-    prefersDark.current = localStorage.getItem('prefersDark');
-    if(!prefersDark.current) {
+  const prefersDark = useRef('false');
+
+  // eslint-disable-next-line
+  useLayoutEffect(() => {
+    console.log("Mounting ThemeProvider");
+    if(!localStorage || !localStorage.getItem('prefersDark')) {
       prefersDark.current = matchMedia("(prefers-color-scheme: dark)").matches;  
+    } else {
+      prefersDark.current = localStorage.getItem('prefersDark');
     }
+    setDark(prefersDark.current==='true');
   }, [])
   
-  const [dark, setDark] = useState(prefersDark.current || false);
-  if(typeof window !== "undefined"){
-  useLayoutEffect(() => {
-    applyTheme();
-    localStorage.setItem('prefersDark', dark);
-  });
-  }
-
-  const applyTheme = () => {
+  const [dark, setDark] = useState(prefersDark.current==='true');
+  const applyTheme = useCallback(() => {
     const root = document.getElementsByTagName("body")[0];
     
     if (dark) {
@@ -33,8 +31,14 @@ export default function ThemeProvider({ children }) {
       root.classList.remove(darkTheme);
       root.classList.add(lightTheme);
     }
-  };
+  }, [dark]);
 
+  // eslint-disable-next-line
+  useLayoutEffect(() => {
+    applyTheme();
+    localStorage.setItem('prefersDark', dark);
+  }, [dark, applyTheme]);
+  
   const toggle = () => {
     setDark(!dark);
   };

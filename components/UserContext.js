@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useRef, useCallback } from "react";
 import { MessageContext } from './MessageContext';
 
 export const UserContext = createContext({
@@ -9,36 +9,46 @@ export const UserContext = createContext({
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState({});
   const { notify } = useContext(MessageContext);
+  const controller = useRef();
 
-  useEffect(() => {
-    retrieveSessionState();
-  });
-
-  const retrieveSessionState = async() => {
-    if(getCookie('uid')){
-      let sessionAuth = await fetch(`/api/auth`, {method: 'POST'});
-      sessionAuth = await sessionAuth.json();
-      if(sessionAuth.success){
-        setUser(sessionAuth.data);
-      } else if (sessionAuth.info){
-        notify( sessionAuth.info , 'info');
-      } else {
-        console.log("Error re-entering session: " +sessionAuth.errors);
+  const retrieveSessionState = useCallback(async() => {
+    controller.current = new AbortController();
+    let validCookie = getCookie('uid');
+    if(validCookie){
+      try{
+        let sessionAuth = await fetch(`/api/auth`, {method: 'POST', signal: controller.current.signal});
+        sessionAuth = await sessionAuth.json();
+        if(sessionAuth?.success){
+          setUser(sessionAuth.data);
+        } else if (sessionAuth?.info){
+          notify( sessionAuth.info , 'info');
+          clearCookie('uid');
+        } else {
+          console.log("Error re-entering session: " +sessionAuth.errors);
+        }
+        controller.current = null;
+      } catch (err) {
+        console.log(err);
       }
     }
-  }
+  }, [notify])
+  
+  useEffect(() => {
+    console.log("Mounting Auth Provider...")
+    retrieveSessionState();
+    return () => {
+      controller.current?.abort();
+    }
+  }, [retrieveSessionState]);
 
   useEffect(() => {
-    if(user.id){
+    if(user?._id){
       setCookie('uid', user._id);
-    } else {
-      clearCookie('uid');
     }
-    
   }, [user]);
 
   const clearCookie = (key) => {
-    document.cookie = `${key}=; max-age=0; path=/; SameSite=Strict`;
+    document.cookie=`${key}=; max-age=0; path=/; SameSite=Strict`;
   }
 
   const getCookie = (key) => {
@@ -47,11 +57,16 @@ export default function AuthProvider({ children }) {
   }
 
   const setCookie = (key, val, duration=(2*7*24*60*60)) => {
-    document.cookie = `${key}=${val}; max-age=${duration}; path=/; SameSite=Strict`;
+    document.cookie=`${key}=${val}; max-age=${duration}; path=/; SameSite=Strict`;
   }
 
   const setAuthContext = (authUser) => {
-    setUser(authUser);
+    if(!authUser?._id){
+      clearCookie('uid');
+      setUser({})
+    } else {
+      setUser(authUser);
+    }
   };
 
   return (

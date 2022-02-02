@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Layout from '../../components/shared/Layout';
 import ProjectInfo from '../../components/shared/ProjectInfo';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -6,16 +6,21 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 import Head from 'next/head';
+import { UserContext } from '../../components/UserContext';
 
 export default function Search({results, currentSearch}){
-  let hits=null, totalHits=0, totalPages=0;
+  let hits=null, totalHits=0, totalPages=0, project_views;
   if(results && results[0]){
     hits = [...results[0].data];
     totalHits = results[0].total;
     const PAGE_SIZE = currentSearch?.page_size || 8;
     totalPages = Math.floor(totalHits/PAGE_SIZE) + Math.ceil((totalHits % PAGE_SIZE)/PAGE_SIZE); 
   }    
-  // shallow routing w state {scroll: false, shallow: true, getServerSideProps: true}
+  const { user } = useContext(UserContext);
+  if(user.project_views){
+    project_views = user.project_views;
+  }
+  // for next and prev shallow routing w state {scroll: false, shallow: true, getServerSideProps: true}
 
   return (
     <Layout>
@@ -61,7 +66,10 @@ export default function Search({results, currentSearch}){
       </Container>
       <Container fluid className='card-group'>
         {hits? 
-        hits.map((project) => <ProjectInfo key={String(project._id)} last_view={user?.project_views?.find((view) => view.project_id === project._id)?.last_view || {}} {...project} />)
+        hits.map((project) => {
+          let last_view = project_views?.find((view) => view.project_id === project._id)?.last_view || null;
+          return(<ProjectInfo key={String(project._id)} {...project} last_view={last_view}/>);
+        })
         :<p className='weak-text m-4 p-5 small border border-muted rounded w-100 text-center'>No matches found</p>}
       </Container>
     </>

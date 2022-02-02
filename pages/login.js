@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useState, useContext} from 'react';
-import {Form, Button, Alert} from 'react-bootstrap';
+import { useState, useContext, useEffect, useRef} from 'react';
+import { Form, Button } from 'react-bootstrap';
 import Layout from '../components/shared/Layout';
 import { MessageContext } from '../components/MessageContext';
 import { UserContext } from '../components/UserContext';
@@ -14,6 +14,14 @@ export default function Login(){
   const { notify } = useContext(MessageContext);
   const { setAuthContext } = useContext(UserContext);
   const router = useRouter();
+  const notified = useRef(false);
+
+  useEffect(() => {
+    if(!notified.current){
+      notified.current = true;
+      router.query.redirect && notify("You need to log in to use this feature");
+    }
+  }, [router.query.redirect, notify])
 
   const handleChange = (evt) => {
     const newCredentials = {...credentials};
@@ -21,7 +29,7 @@ export default function Login(){
     setCredentials(newCredentials);
   }
 
-  const handleSubmit = async(event) => {
+  const handleSubmit = async(event) => { 
     event.preventDefault();
     event.stopPropagation();
     try{
@@ -34,7 +42,13 @@ export default function Login(){
       if(data.success) {
         notify("Log In Successful", 'success');
         setAuthContext(data.data);
-        setTimeout(() => router.push('/'), 2000);
+        if(router.query.redirect){
+          setTimeout(() => {
+            router.push(router.query.redirect);
+          }, 1400);
+        } else {
+          setTimeout(() => router.push('/'), 1400);
+        }
       } else { 
         throw data.errors
       }
@@ -68,5 +82,3 @@ export default function Login(){
     </Layout>
   );
 }
-
-

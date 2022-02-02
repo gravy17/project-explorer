@@ -12,11 +12,19 @@ function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
+  useEffect(()=> {
+    return function cleanup(){
+      setLoading(false);
+    }
+  })
+
   useEffect(() => {
     const handleStart = (url) => {
       url !== router.pathname ? setLoading(true) : setLoading(false);
     };
-    const handleComplete = (url) => setLoading(false);
+    const handleComplete = (url) => {
+      return setLoading(false);
+    };
 
     router.events.on("routeChangeStart", handleStart);
     router.events.on("routeChangeComplete", handleComplete);

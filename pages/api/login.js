@@ -1,5 +1,4 @@
 import baseHandler from '../../lib/middleware/common';
-// import { getSession } from '../../lib/middleware/session';
 import { authenticate } from '../../services/user';
 
 export default baseHandler().post(async(req, res) => {
@@ -10,9 +9,6 @@ export default baseHandler().post(async(req, res) => {
     if(!isAuthenticated){
       throw new Error('Invalid credentials...');
     }
-    
-    // const session = await getSession(req, res);
-    // session.user = result;
     req.session.user = result;
 
     res.status(200).json({ success: true, data: result });

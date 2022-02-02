@@ -10,7 +10,7 @@ import ProjectTag from '../../components/shared/ProjectTag';
 import Head from 'next/head';
 
 export default function Project({project, creatorName}) {
-
+ 
   return (
     <Layout>
       <>

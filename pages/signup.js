@@ -5,6 +5,7 @@ import {Form, Button} from 'react-bootstrap';
 import Layout from '../components/shared/Layout';
 import { MessageContext } from '../components/MessageContext';
 import { UserContext } from '../components/UserContext';
+import { getPrograms, getGradYears } from '../services/school';
 
 export default function Signup({programs, graduationYears}){
   const [userDetails, setUserDetails] = useState({
@@ -104,16 +105,17 @@ export default function Signup({programs, graduationYears}){
 }
 
 export async function getStaticProps() {
-  let programs = await fetch(`${process.env.BASE_URL}/api/programs`);
-  programs = await programs.json();
-  let graduationYears = await fetch(`${process.env.BASE_URL}/api/graduationYears`);
-  graduationYears = await graduationYears.json();
-
-  return {
-    props: {
-      programs: programs.data,
-      graduationYears: graduationYears.data
-    },
-    revalidate: 60*60*24 //1 Day
+  try {
+    const programs = await getPrograms();
+    const graduationYears = await getGradYears();
+    return {
+      props: {
+        programs,
+        graduationYears
+      },
+      revalidate: 60*60*24
+    }
+  } catch (e) {
+    console.log(e)
   }
 }

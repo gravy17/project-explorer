@@ -43,7 +43,7 @@ export async function getById(id) {
   }
 };
 
-async function getAll() {
+export async function getAll() {
   try {
     return await Project.find({}).lean();
   }

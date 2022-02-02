@@ -1,6 +1,5 @@
 import { create } from '../../services/user';
 import baseHandler from '../../lib/middleware/common';
-// import { getSession } from '../../lib/middleware/session';
 
 export default baseHandler().post(async(req, res) => {
   try {
@@ -11,8 +10,6 @@ export default baseHandler().post(async(req, res) => {
       throw new Error(result);  
     }
 
-    // const session = await getSession(req, res);
-    // session.user = result;
     req.session.user = result;
 
     res.status(200).json({ success: true, data: result });
