@@ -2,7 +2,8 @@ import Search from "./[term]";
 export default Search;
 
 export async function getServerSideProps(req) {
-  const { term, criteria, page } = req.query;
+  const { criteria, page } = req.query;
+  const { term } = req.params;
   if(!term){
     return {
       props: {

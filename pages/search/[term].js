@@ -106,7 +106,8 @@ export default function Search({results, currentSearch}){
 }
 
 export async function getServerSideProps(req) {
-  const { term, criteria, page } = req.query;
+  const { criteria, page } = req.query;
+  const { term } = req.params;
   try {
     const data = await fetch(`${process.env.VERCEL_URL}/api/search/${term}?criteria=${criteria || 'name'}&page=${page}`);
     const searchRes = await data.json();
