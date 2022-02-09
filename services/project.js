@@ -1,8 +1,8 @@
 import { ObjectId } from "mongodb";
+import dbConnect from "../lib/middleware/dbConnect";
 import Project from "../models/project";
 import { translateError } from "../models/mongo_helper";
 import generatePipeline from "../lib/utils/searchQuery";
-import dbConnect from "../lib/middleware/dbConnect";
 
 const TTL = (1000 * 60 * 30);
 let cached = global.projects;
@@ -36,7 +36,8 @@ export async function create({ name, abstract, authors, tags, createdBy }) {
 export async function getById(id) {
   try {
     await dbConnect();
-    return await Project.findById(id).populate('createdBy').lean();
+    const proj = await Project.findById(id).populate('createdBy', {password: 0, salt: 0, matricNumber: 0, email: 0, project_views: 0 }).lean();
+    return proj;
   }
   catch(err) {
     console.log(translateError(err)) ;
@@ -45,7 +46,9 @@ export async function getById(id) {
 
 export async function getAll() {
   try {
-    return await Project.find({}).lean();
+    await dbConnect();
+    const projects = await Project.find({}).lean();
+    return projects;
   }
   catch(err) {
     console.log(translateError(err)) ;

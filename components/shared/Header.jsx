@@ -5,15 +5,17 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
+import { MessageContext } from '../MessageContext';
 
-const Header = ({user, setAuthContext}) => {
+const Header = ({user, updateUser}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const handleSearchInput = (event) => {
     setSearchTerm(event.target.value);
   }
   const router = useRouter();
+  const { notify } = useContext(MessageContext);
   const goToSearch = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -29,9 +31,9 @@ const Header = ({user, setAuthContext}) => {
   }
 
   const logout = async() => {
-    setAuthContext({});
+    updateUser({ type: 'clear' });
     await fetch(`/api/logout`);
-    router.push('/');
+    notify("Logged out successfully");
   }
 
   return (
@@ -54,8 +56,8 @@ const Header = ({user, setAuthContext}) => {
         </Nav>
           {firstname?
           <Nav className='justify-content-end my-2 my-lg-0 '>
+            <Nav.Link id='username'>Hi {firstname} !</Nav.Link>
             <Nav.Link onClick={logout}>Logout</Nav.Link>
-            <Nav.Link id='username'>Hi {firstname}</Nav.Link>
           </Nav> :
           <Nav className='justify-content-end my-2 my-lg-0 '>
             <Link href='/signup' passHref><Nav.Link>Sign Up</Nav.Link></Link>

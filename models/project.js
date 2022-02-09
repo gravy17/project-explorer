@@ -8,6 +8,8 @@ const ProjectSchema = new Schema({
   createdBy: { type: Types.ObjectId, required: true, ref: "User" }
 }, { timestamps: true });
 
+ProjectSchema.index({ name: "text", abstract: "text", authors: "text", tags: "text" })
+
 const Project = models.Project || model('Project', ProjectSchema);
 
 export default Project;

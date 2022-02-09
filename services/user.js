@@ -1,7 +1,8 @@
 import { ObjectId } from "mongodb";
+import dbConnect from "../lib/middleware/dbConnect";
 import User from "../models/user";
 import { translateError } from "../models/mongo_helper";
-import dbConnect from "../lib/middleware/dbConnect";
+
 
 export async function create({ firstname, lastname, email, password, matricNumber, program, graduationYear }) {
   const newUser = new User({

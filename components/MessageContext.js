@@ -1,9 +1,7 @@
-import { createContext, useState, useEffect, useRef } from "react";
+import { createContext, useState, useEffect, useRef, useCallback } from "react";
 
 export const MessageContext = createContext({
-  messages: [],
-  notify: () => {},
-	cancelNotify: () => {}
+  notify: () => {}
 });
 
 const Toast = ({children, status, closeMsg}) => {
@@ -18,7 +16,7 @@ const Toast = ({children, status, closeMsg}) => {
 			setWideView(false);
 			closeMsg();
 		}
-	}, [closeMsg])
+	}, [])
 
 	const open = function(){
 		setWideView(true);
@@ -35,7 +33,7 @@ const Toast = ({children, status, closeMsg}) => {
 			onClick={open}>
 				<div className="float-left mt-0 ml-1">
 				<span className={`${status}`}>{status}</span>
-				<p className={'pre-line h6 mb-0 '+ status}>
+				<p className={'pre-line h6 mb-0 strong-text'+ status}>
 					{children}
 				</p>
 				</div>
@@ -46,47 +44,40 @@ const Toast = ({children, status, closeMsg}) => {
 }
 
 export default function ToastProvider({ children }) {
-  const [messages, setMessages] = useState([]);
+  const messages = useRef([]);
   const [showing, setShowing] = useState(false);
 	const [status, setStatus] = useState('');
 
-	const showToast = () => {
-		if(!showing){
-			setShowing(true);
-		}
-  };
-
-	const hideToast = () => {
+	const hideToast = useCallback(() => {
 		setShowing(false);
 		setStatus('');
-		setMessages([]);
-  };
+		messages.current = [];
+  }, [])
 
-  const notify = (msg, status) => {
+  const notify = useCallback((msg, status) => {
 		if(typeof msg === 'object'){
 			if(msg.length){
-				setMessages([...messages, ...msg]);
+				msg.map((item) => {
+					messages.current.push(item);
+				})
 			} else {
-				setMessages([...messages, msg.message])
+				messages.current.push(msg.message);
 			}
 		}
 		if(typeof msg === 'string'){
 			if(msg.startsWith('\[') && msg.endsWith('\]')){
 				let msgArr = JSON.parse(msg) 
-				setMessages([...messages, ...msgArr])
+				msgArr.map((item) => {
+					messages.current.push(item);
+				})
 			} else {
-				setMessages([...messages, msg]);
+				messages.current.push(msg);
 			}
 		}
+		messages.current = [...new Set(messages.current)]
 		setStatus(status || 'info');
-  };
-
-	useEffect(() => {
-		console.log("Mounting Toast Provider")
-		if(messages.length){
-			setShowing(true);
-		}
-  }, [messages]);
+		setShowing(true);
+  }, [messages.current])
 
   return (
     <MessageContext.Provider
@@ -95,7 +86,7 @@ export default function ToastProvider({ children }) {
       }}
     >
       {children}
-			{showing && <Toast status={status} closeMsg={hideToast}>{messages.map(message => message+'\n')}</Toast>}
+			{showing && <Toast status={status} closeMsg={hideToast}>{messages.current.map(message => message+'\n')}</Toast>}
     </MessageContext.Provider>
   );
 }

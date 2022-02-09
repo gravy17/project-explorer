@@ -3,14 +3,14 @@ import { randomBytes, pbkdf2Sync } from 'crypto';
 
 //schema for storing latest project views for each user
 const ViewSchema = new Schema({
-  project_id: { type:  Types.ObjectId, unique: true, index: true},
+  project_id: { type:  Types.ObjectId, unique: true, index: true, required: true},
   last_view: Date
 }, { _id : false }); //should not have a generated id
 
 const UserSchema = new Schema({
   firstname: {type: String, required: true},
   lastname: {type: String, required: true},
-  email: {type: String, required: true, unique: true},
+  email: {type: String, required: true, unique: true, index: true},
   password: {type: String, required: true},
   salt: {type: String, required: true},
   matricNumber: {type: String, required: true},    

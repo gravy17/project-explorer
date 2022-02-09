@@ -14,6 +14,7 @@
   --pe-yellow: hsla(42, 95%, 50%, 0.9);
   --pe-white: hsla(0, 0%, 100%, 0.8);
   --pe-dark: #333;
+  --less-white: hsla(0, 0%, 100%, 0.4);;
   --less-dark: #777;
   --very-dark: #191919;
   --bg-filter: brightness(100%) blur(2px);
@@ -141,7 +142,6 @@ a {
 }
 
 .hoverable {
-  box-shadow: var(--theme-highlight);
   transition: box-shadow 0.25s ease;
 }
 .hoverable:hover, .hoverable:focus {
@@ -308,15 +308,29 @@ option {
   text-shadow: 2px 4px 3px rgba(0,0,0,0.3);
 }
 .themed-tag {
-  border: 1px solid var(--theme-accent);
+  border: 1px solid var(--theme-color);
+  color: var(--theme-color);
 }
 .themed-tag:hover, .themed-tag:hover .tag-link{
-  background-color: var(--theme-color) !important;
-  border-color: var(--theme-color);
+  background-color: var(--theme-accent) !important;
+  border-color: var(--theme-accent);
   text-decoration: none;
-  color: var(--theme-accent) !important;
+  color: var(--theme-bg) !important;
+  cursor: pointer;
+  box-shadow: var(--theme-highlight);
 }
-
+.hoverable:hover .themed-tag {
+  border-color: var(--theme-bg);
+}
+.hoverable:hover .tag-link {
+  color: var(--theme-bg) !important;
+}
+.hoverable:hover .themed-tag:hover {
+  border-color: var(--theme-color);
+}
+.hoverable:hover .themed-tag:hover a.tag-link {
+  color: var(--theme-color) !important;
+}
 .bolder {
   font-weight: bolder;
 }
@@ -360,7 +374,7 @@ body{
 }
 
 .notification .info {
-  color: var(--pe-yellow);
+  color: var(--theme-accent);
 }
 
 .notification .error {

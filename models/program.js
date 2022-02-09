@@ -1,7 +1,7 @@
 import { Schema, models, model } from "mongoose";
 
 const ProgramSchema = new Schema({
-  name: { type: String, required: true, unique: true },
+  name: { type: String, required: true, unique: true, index: true },
   accredYear: { type: Number, required: true }
 }, { timestamps: false });
 

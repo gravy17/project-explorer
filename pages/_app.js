@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import ThemeProvider from "../components/ThemeContext";
-import ToastProvider from '../components/MessageContext';
+import ToastProvider, { MessageContext } from '../components/MessageContext';
 import AuthProvider from '../components/UserContext';
 import Loader from '../components/shared/Loader';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -23,24 +23,29 @@ function MyApp({ Component, pageProps }) {
       url !== router.pathname ? setLoading(true) : setLoading(false);
     };
     const handleComplete = (url) => {
-      return setLoading(false);
+      setLoading(false);
     };
 
     router.events.on("routeChangeStart", handleStart);
     router.events.on("routeChangeComplete", handleComplete);
     router.events.on("routeChangeError", handleComplete);
-  }, [router]);
+  }, []);
 
   return (
-    <ThemeProvider>
-        <Loader loading={loading}/>
-        {!loading && 
+    <>
+      <Loader loading={loading}/>
+      {!loading && (<ThemeProvider>
         <ToastProvider>
-          <AuthProvider>
-            <Component {...pageProps}/>
-          </AuthProvider>
-        </ToastProvider>}
-    </ThemeProvider>
+          <MessageContext.Consumer>
+          {({notify}) => (
+            <AuthProvider {...notify}>
+              <Component {...pageProps}/>
+            </AuthProvider>
+          )}
+          </MessageContext.Consumer>
+        </ToastProvider>
+      </ThemeProvider>)}
+    </>
   )
 }
 

@@ -10,7 +10,6 @@ export default function ThemeProvider({ children }) {
 
   // eslint-disable-next-line
   useLayoutEffect(() => {
-    console.log("Mounting ThemeProvider");
     if(!localStorage || !localStorage.getItem('prefersDark')) {
       prefersDark.current = matchMedia("(prefers-color-scheme: dark)").matches;  
     } else {

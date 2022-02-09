@@ -1,3 +1,5 @@
+import {getAll, getById} from '../../services/project';
+
 import Card from 'react-bootstrap/Card'; 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Form from 'react-bootstrap/Form';
@@ -8,17 +10,36 @@ import Col from 'react-bootstrap/Col';
 import Layout from '../../components/shared/Layout';
 import ProjectTag from '../../components/shared/ProjectTag';
 import Head from 'next/head';
+import { useContext, useEffect } from 'react';
+import { UserContext } from '../../components/UserContext';
 
 export default function Project({project, creatorName}) {
- 
+  const { user, updateUser } = useContext(UserContext);
+
+  useEffect(() => {
+    if(user._id){
+      fetch(`/api/project/trackView?id=${project._id}`)
+      .then((res) => res.json())
+      .then(data => {
+        if(data.success) {
+          let updatedUser = {...user};
+          updatedUser.project_views = data.data;
+          updateUser({type: 'set', payload: updatedUser});
+        }
+      }).catch(e => {
+        console.log(e);
+      })
+    }
+  }, [])
+
   return (
     <Layout>
       <>
         <Head>
-          <title>Project- (project.name) | Project-Explorer</title>
+          <title>Project- {project.name} | Project-Explorer</title>
         </Head>
-        <h4 className='mt-4 ml-4' id='project_name'>{project?.name}</h4>
-        <Container fluid className='mb-4 ml-4'>
+        <h4 className='mt-4 ml-4 themed' id='project_name'>{project?.name}</h4>
+        <Container className='w-100 mb-4 mx-auto strong-text'>
           <Row className='py-2'>
             <Col>
               <h6 className='m-2' id='project_author'>CreatedBy<br/>{creatorName}</h6>
@@ -37,22 +58,22 @@ export default function Project({project, creatorName}) {
         <Container fluid>
           <Row>
             <Col>
-              <h5 className="mb-2">Project Abstract</h5>
+              <h5 className="mb-2 themed">Project Abstract</h5>
               <hr/>
-              <p id='project_abstract'>{project?.abstract}</p>
-              <h5>Comments</h5>
+              <p id='project_abstract' className='strong-text'>{project?.abstract}</p>
+              <h5 className='themed'>Comments</h5>
               <Form.Control as='textarea' className='mb-2' placeholder='Leave a comment'></Form.Control>
               <Button>Submit</Button>
               <hr/>
-              <p className='text-center text-secondary'>No comments added yet</p>
+              <p className='weak-text'>No comments added yet</p>
             </Col>
             <Col>
-            <h5 className="mb-2">Project Details</h5>
+            <h5 className="mb-2 themed">Project Details</h5>
             <hr/>
-              <Card className='mb-3 theme-bg'>
-                <Card.Header>Author(s)</Card.Header>
-                <ListGroup variant='flush' id='project_authors'>
-                  {project?.authors.map((author, idx) => <ListGroup.Item key={idx}>{author}</ListGroup.Item>)}
+              <Card className='mb-3 bg-theme'>
+                <Card.Header className='themed'>Author(s)</Card.Header>
+                <ListGroup className='bg-theme' id='project_authors'>
+                  {project?.authors.map((author, idx) => <ListGroup.Item key={idx} className='bg-theme strong-text'>{author}</ListGroup.Item>)}
                 </ListGroup>
                 <Card.Footer id='project_tags'>
                 {project?.tags.map(
@@ -60,10 +81,10 @@ export default function Project({project, creatorName}) {
                 )}
                 </Card.Footer>
               </Card>
-              <Card>
-                <Card.Header>Project Files</Card.Header>
+              <Card className='bg-theme'>
+                <Card.Header className='themed'>Project Files</Card.Header>
                 <Card.Body>
-                  <p className='text-center'>No file uploaded yet</p>
+                  <p className='text-center weak-text'>No file uploaded yet</p>
                 </Card.Body>
               </Card>
             </Col>
@@ -74,16 +95,30 @@ export default function Project({project, creatorName}) {
   );
 }
 
+export async function getStaticProps(req) {
+  const {id} = req.params;
+  try {
+    let project = await getById(id);
+    let creatorName = project.createdBy.firstname + ' ' +  project.createdBy.lastname;
+    project = JSON.parse(JSON.stringify(project));
+    return {
+      props: {
+        project,
+        creatorName
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+} 
 
-
-// export async function getStaticPaths({}){
-//   const req = await fetch();
-//   const data = await req.json();
-//   const paths = data.map(path => {
-//     return { params: { id: path}}
-//   })
-//   return {
-//     paths,
-//     fallback: false
-//   };
-// }
+export async function getStaticPaths({}){
+  let projects = await getAll();
+  const paths = projects.map(projectPath => {
+    return { params: { id: String(projectPath._id) }}
+  })
+  return {
+    paths,
+    fallback: 'blocking'
+  };
+}

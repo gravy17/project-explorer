@@ -10,14 +10,26 @@ export default function CreateProject() {
   const [project, setProject] = useState({name: '', abstract: '', authors: '', tags: ''});
   
   const { user } = useContext(UserContext);
+  const [ hasUser, setHasUser ] = useState( true );
+  
   const { notify } = useContext(MessageContext);
+  
   const router = useRouter();
 
-  useEffect(() => {
-    if(!user._id) {
-      router.push("/login?redirect=projects/submit")
+  useEffect(() => { 
+    if(!hasUser) {
+      notify("You need to log in to use this feature");
+      setTimeout(()=>{
+        router.push({ pathname: '/login', query: { redirect: '/projects/submit' }}, '/login', {shallow: true})
+      }, 700)
     }
-  }, [user, router])
+  }, [hasUser])
+
+  useEffect(() => {
+    if(!user?._id) {
+      setHasUser(false);
+    }
+  }, [user])
 
   const handleChange = (evt) => {
     let modified = { ...project };
@@ -77,24 +89,3 @@ export default function CreateProject() {
     </Layout>
   );
 }
-
-// export async function getServerSideProps({req}) {
-//   const cookies = req.headers.cookie;
-//   const sid = cookies
-//     .split(';')
-//     .filter(cookie => 
-//       cookie.trim()
-//       .startsWith(`sid=`))[0]
-//       ?.split('=')[1] || null;
-//   if(!sid) {
-//     return {
-//       redirect: {
-//         permanent: false,
-//         destination: "/login?redirect=projects/submit"
-//       }
-//     }
-//   }
-//   return { 
-//     props: {}
-//   }
-// }

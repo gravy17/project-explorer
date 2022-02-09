@@ -1,10 +1,9 @@
-Project + Paths
-Search
-style info cards & tags, project-view
-Correct Redirect behavior
-Successfully Build
-
 Google auth
-inline styles 
-Wepback
+inline critical css... or modularize it
+Wepback config
 Form Feedback
+
+re-add unit tests
+add test for when notifications are shown, when user is logged in and logged out, when theme is toggled
+
+Other features- edit, upload, profile, like/comment, save/library, change password/details, advanced search/suggestions

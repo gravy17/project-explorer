@@ -1,17 +1,16 @@
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import Badge from 'react-bootstrap/Badge';
 
 const ProjectTag = ({value}) => {
-  const router = useRouter();
-  const openSearch = () => {
-    router.push(`/search/${value}?criteria=tags`);
-  }
   return (
-    <Badge pill className="themed-tag m-1 px-2 py-1 hoverable">
-      <a onClick={openSearch} className='tag-link bolder headerFont' style={{ fontSize: '0.75rem', fontWeight: 'bold'}}>
+    <Link href={`/search/${value}?criteria=tags`} passHref>
+    <Badge pill className="themed-tag m-1 px-2 py-1">
+      <a className='tag-link bolder headerFont' style={{ fontSize: '0.75rem', fontWeight: 'bold'}}>
         {value}
       </a>
     </Badge>
+    </Link>
+    
   );
 }
 

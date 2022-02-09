@@ -12,16 +12,8 @@ export default function Login(){
     password: ''
   })
   const { notify } = useContext(MessageContext);
-  const { setAuthContext } = useContext(UserContext);
+  const { updateUser } = useContext(UserContext);
   const router = useRouter();
-  const notified = useRef(false);
-
-  useEffect(() => {
-    if(!notified.current){
-      notified.current = true;
-      router.query.redirect && notify("You need to log in to use this feature");
-    }
-  }, [router.query.redirect, notify])
 
   const handleChange = (evt) => {
     const newCredentials = {...credentials};
@@ -40,11 +32,11 @@ export default function Login(){
       });
       const data = await res.json();
       if(data.success) {
-        notify("Log In Successful", 'success');
-        setAuthContext(data.data);
+        notify("Log In Successful!", 'success');
+        updateUser({type: 'set', payload: data.data});
         if(router.query.redirect){
           setTimeout(() => {
-            router.push(router.query.redirect);
+            router.push(router.query.redirect, undefined, {shallow: true});
           }, 1400);
         } else {
           setTimeout(() => router.push('/'), 1400);
@@ -76,7 +68,6 @@ export default function Login(){
           <Form.Group className='mx-auto'>
             <Button type='submit' className="primarybtn" size='sm'>Login</Button>
           </Form.Group>
-          
         </Form>
       </>
     </Layout>

@@ -1,3 +1,5 @@
+import { getShowcase } from '../services/project';
+
 import Head from 'next/head';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import Button from 'react-bootstrap/Button';
@@ -6,19 +8,15 @@ import Layout from '../components/shared/Layout';
 import ProjectInfo from '../components/shared/ProjectInfo';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { UserContext } from '../components/UserContext';
-import { getShowcase } from '../services/project';
 
 export default function Home({ projects }) {
   let project_views;
   const { user } = useContext(UserContext);
-  
-  useEffect(() => {
-    if(user.project_views){
-      project_views = user.project_views;
-    }
-  }, [user])
+  if(user.project_views){
+    project_views = user.project_views;
+  }
 
   return (
     <Layout>
@@ -38,7 +36,7 @@ export default function Home({ projects }) {
             <Image src='/hero-illustration.svg' alt="decorative opened tabs illustration" layout='fill' objectFit='fill'></Image>
           </div>          
         </Jumbotron>
-        <Container className='card-group pb-5'>
+        <Container fluid className='card-group pb-5'>
           {projects? 
           projects.map((project) => {
             let last_view = project_views?.find((view) => view.project_id === project._id)?.last_view || null;
@@ -59,7 +57,7 @@ export async function getStaticProps() {
       props: {
         projects
       },
-      revalidate: 60*30 //30 mins
+      revalidate: 60*30
     }
   } catch (e) {
     console.log(e);

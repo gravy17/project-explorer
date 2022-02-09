@@ -8,8 +8,8 @@ const Layout = ({children}) => {
     <>
       <header className='sticky-top'>
         <UserContext.Consumer>
-          {({user, setAuthContext}) => (
-            <Header user={user} setAuthContext={setAuthContext}/>
+          {({user, updateUser}) => (
+            <Header user={user} updateUser={updateUser}/>
           )}
         </UserContext.Consumer>
       </header>

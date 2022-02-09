@@ -1,3 +1,5 @@
+import { getPrograms, getGradYears } from '../services/school';
+
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState, useContext } from 'react';
@@ -5,7 +7,6 @@ import {Form, Button} from 'react-bootstrap';
 import Layout from '../components/shared/Layout';
 import { MessageContext } from '../components/MessageContext';
 import { UserContext } from '../components/UserContext';
-import { getPrograms, getGradYears } from '../services/school';
 
 export default function Signup({programs, graduationYears}){
   const [userDetails, setUserDetails] = useState({
@@ -18,7 +19,7 @@ export default function Signup({programs, graduationYears}){
     graduationYear: ''
   })
   const { notify } = useContext(MessageContext);
-  const { setAuthContext } = useContext(UserContext);
+  const { updateUser } = useContext(UserContext);
   const router = useRouter();
 
   const handleChange = (evt) => {
@@ -39,7 +40,7 @@ export default function Signup({programs, graduationYears}){
       const data = await res.json();
       if(data.success) {
         notify("Signup Completed!", 'success');
-        setAuthContext(data.data)
+        updateUser({type: 'set', payload: data.data});
         setTimeout(() => router.push('/'), 2000);
       } else { 
         throw data.errors
