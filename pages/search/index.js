@@ -4,7 +4,8 @@ export default Search;
 export async function getServerSideProps(req) {
   const { criteria, page } = req.query;
   const { term } = req.params || { term: '' };
-  console.log(term);
+  console.log("Term: "+ term);
+  console.log("VERCEL_URL: "+process.env.VERCEL_URL);
   if(!term){
     return {
       props: {
