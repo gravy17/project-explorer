@@ -3,7 +3,7 @@ export default Search;
 
 export async function getServerSideProps(req) {
   const { criteria, page } = req.query;
-  const { term } = req.params;
+  const { term } = req.params || { term: '' };
   if(!term){
     return {
       props: {
